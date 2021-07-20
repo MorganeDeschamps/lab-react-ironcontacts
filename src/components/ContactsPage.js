@@ -6,22 +6,23 @@ import ContactRow from "./ContactRow";
 import Button from "./Button";
 
 
-import contactsData from "../contacts.json"
+import contactsFile from "../contacts.json"
+const contactsData = [...contactsFile]
 
 
 function ContactsPage() {
 
-    const firstFiveArray = contactsData.filter((contact, index, array) => array.indexOf(contact) < 5 )
+    const firstFiveArray = contactsData.splice(0, 5)
 
     const [contacts, setContacts] = useState(firstFiveArray)
-
   
     function addRandom() {
-      let newContact = contactsData[Math.floor(Math.random() * (contactsData.length - 1))]
+      let randomIndex = Math.floor(Math.random() * (contactsData.length - 1));
 
-      const arrayToConcat = [newContact]
-      const updatedContactsArray = contacts.concat(arrayToConcat)
-      setContacts(updatedContactsArray)
+      let newContact = contactsData.splice(randomIndex, 1)
+
+      setContacts([newContact, ...contacts])
+      console.log("contactsData: ", contactsData, "contacts: ", contacts)
     }
     
 
@@ -51,22 +52,17 @@ function ContactsPage() {
     
 
 
-    function deleteContact(contactId) {
-      const updatedContactsArray = contacts.filter(contact => contact.id !== contactId)
-      setContacts(updatedContactsArray)
-    }
-    
-
-
   return (
     <div className="Contacts-page">
 
     <h2 class="title is-2">Contacts: </h2>
 
     <div class="buttons are-medium">
-      <Button buttonName="Add rando" buttonClass="button add-random-contact is-primary" handleFunction={addRandom}/>
-      <Button buttonName="Sort by name" buttonClass="button sort-by-name is-info is-light" handleFunction={sortContacts} params="name"/>
-      <Button buttonName="Sort by popularity" buttonClass="button sort-by-popularity is-info is-light" handleFunction={sortContacts} params="popularity" />
+
+      <button className="button is-primary" onClick={addRandom}> Add rando </button>
+      <button className="button is-info is-light" onClick={() => sortContacts("name")}> Sort by name </button>
+      <button className="button is-info is-light" onClick={() => sortContacts("popularity")}> Sort by popularity </button>
+ 
     </div>
 
     <table id="contacts-table" class="table is-hoverable">
@@ -81,7 +77,7 @@ function ContactsPage() {
         <tbody>
           {contacts.map((contact, index) => {
               return (
-                  <ContactRow key={index} contact={contact} handleFunction={deleteContact}/>
+                  <ContactRow key={index} contact={contact} contactList={contacts} handleDelete={setContacts}/>
               )
           })}
         </tbody>
